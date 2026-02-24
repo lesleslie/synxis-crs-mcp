@@ -1,10 +1,27 @@
 [project]
 name = "synxis-crs-mcp"
 version = "0.1.1"
-description = "Add your description here"
+description = "MCP server for SynXis CRS (Central Reservation System) API"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastmcp>=2.12.3",
+    "mcp-common>=0.4.8",
+    "oneiric>=0.3.6",
+    "httpx>=0.28.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.0.0",
+    "rich>=13.0.0",
+    "typer>=0.15.0",
+]
+
+[project.scripts]
+synxis-crs-mcp = "synxis_crs_mcp.cli:main"
+
+[tool.synxis-crs-mcp]
+http_port = 3046
+http_host = "127.0.0.1"
+enable_http_transport = false
 
 [dependency-groups]
 dev = [
@@ -20,10 +37,6 @@ dev = [
     "bandit>=1.8.0",
     "creosote>=3.0.0",
 ]
-
-# Minimal MCP Server Template
-# For: MCP servers, simple tools, microservices
-# Features: Basic quality tools, fast setup, parallel test support
 
 [tool.ruff]
 target-version = "py313"
@@ -46,7 +59,6 @@ addopts = [
     "--cov=synxis_crs_mcp",
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html:htmlcov",
-    "--cov-report=json",
     "--strict-markers",
     "--strict-config",
     "-ra",
@@ -56,20 +68,14 @@ markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "slow: Slow tests (>2s)",
-    "benchmark: Benchmark tests (deferred)",
+    "mock: Tests using mock mode",
 ]
 
 [tool.coverage.run]
 branch = true
-parallel = true  # CRITICAL for pytest-xdist
-concurrency = ["multiprocessing"]
+parallel = true
 source = ["synxis_crs_mcp"]
-data_file = ".coverage"
-omit = [
-    "*/tests/*",
-    "*/__pycache__/*",
-    "*/__init__.py",
-]
+omit = ["*/tests/*", "*/__pycache__/*"]
 
 [tool.coverage.report]
 exclude_also = [
@@ -84,17 +90,3 @@ exclude_also = [
 target = ["synxis_crs_mcp"]
 skips = ["B101", "B110", "B112", "B404", "B603", "B607"]
 exclude_dirs = ["tests/"]
-
-[tool.creosote]
-paths = ["synxis_crs_mcp"]
-deps-file = "pyproject.toml"
-exclude-deps = [
-    "hatchling",
-    "pytest",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-mock",
-    "pytest-xdist",
-    "pytest-timeout",
-    "ruff",
-]
