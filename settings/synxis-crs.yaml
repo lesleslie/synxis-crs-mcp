@@ -1,0 +1,24 @@
+# SynXis CRS MCP Server Configuration
+#
+# Override with environment variables: SYNXIS_CRS_{FIELD}
+
+server_name: "synxis-crs-mcp"
+server_description: "MCP server for SynXis Central Reservation System"
+
+# API Configuration
+base_url: "https://api.synxis.com/crs/v1"
+hotel_id: ""
+timeout: 30.0
+max_retries: 3
+
+# Mock Mode (for testing without real API access)
+mock_mode: false
+
+# HTTP Transport
+enable_http_transport: true
+http_host: "127.0.0.1"
+http_port: 3046
+
+# Logging (Oneiric style)
+log_level: "INFO"
+log_json: true
