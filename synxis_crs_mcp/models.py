@@ -12,13 +12,13 @@ API Documentation: https://developer.synxis.com/
 from __future__ import annotations
 
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class RoomType(str, Enum):
+class RoomType(StrEnum):
     """Room type categories."""
 
     STANDARD = "STANDARD"
@@ -28,7 +28,7 @@ class RoomType(str, Enum):
     PRESIDENTIAL = "PRESIDENTIAL"
 
 
-class RatePlanType(str, Enum):
+class RatePlanType(StrEnum):
     """Rate plan categories."""
 
     BAR = "BAR"  # Best Available Rate
@@ -38,7 +38,7 @@ class RatePlanType(str, Enum):
     GROUP = "GROUP"
 
 
-class ReservationStatus(str, Enum):
+class ReservationStatus(StrEnum):
     """Reservation status values."""
 
     PENDING = "PENDING"
@@ -150,7 +150,9 @@ class GuestInfo(BaseModel):
     address: str | None = Field(default=None, description="Guest address")
     city: str | None = Field(default=None, description="Guest city")
     country: str | None = Field(default=None, description="Guest country code")
-    loyalty_number: str | None = Field(default=None, description="Loyalty program number")
+    loyalty_number: str | None = Field(
+        default=None, description="Loyalty program number"
+    )
 
 
 class BookingRequest(BaseModel):

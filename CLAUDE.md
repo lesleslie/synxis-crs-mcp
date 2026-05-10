@@ -1,4 +1,8 @@
-# Claude Code Guidelines for synxis-crs-mcp
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+For a shorter, tool-neutral bootstrap document, start with `AGENTS.md`.
 
 ## Project Overview
 
@@ -50,11 +54,12 @@ uv run creosote
 ### Pre-Commit Workflow
 
 1. Format code: `uv run ruff format .`
-2. Run linter: `uv run ruff check .`
-3. Run tests: `uv run pytest`
-4. Check coverage: Review `htmlcov/index.html`
+1. Run linter: `uv run ruff check .`
+1. Run tests: `uv run pytest`
+1. Check coverage: Review `htmlcov/index.html`
 
 <!-- CRACKERJACK_START -->
+
 ## Crackerjack Integration
 
 This project is configured with crackerjack best practices:
@@ -75,10 +80,12 @@ This project is configured with crackerjack best practices:
 ### AI Agent Skills
 
 Crackerjack provides AI agent skills via MCP:
+
 - RefactoringAgent - Code complexity issues
 - SecurityAgent - Security vulnerabilities
 - PerformanceAgent - Performance optimization
 - TestAgent - Test generation and improvement
 
 Access these skills through the crackerjack MCP server (port 8676).
+
 <!-- CRACKERJACK_END -->

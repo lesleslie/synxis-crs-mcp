@@ -71,10 +71,30 @@ MOCK_PROPERTIES: list[dict[str, Any]] = [
 ]
 
 MOCK_ROOM_TYPES: list[dict[str, Any]] = [
-    {"room_type": "STD", "room_type_name": "Standard Room", "max_occupancy": 2, "bed_type": "Queen"},
-    {"room_type": "DLX", "room_type_name": "Deluxe Room", "max_occupancy": 2, "bed_type": "King"},
-    {"room_type": "SUI", "room_type_name": "Suite", "max_occupancy": 4, "bed_type": "King + Sofa"},
-    {"room_type": "EXE", "room_type_name": "Executive Suite", "max_occupancy": 4, "bed_type": "King + Twin"},
+    {
+        "room_type": "STD",
+        "room_type_name": "Standard Room",
+        "max_occupancy": 2,
+        "bed_type": "Queen",
+    },
+    {
+        "room_type": "DLX",
+        "room_type_name": "Deluxe Room",
+        "max_occupancy": 2,
+        "bed_type": "King",
+    },
+    {
+        "room_type": "SUI",
+        "room_type_name": "Suite",
+        "max_occupancy": 4,
+        "bed_type": "King + Sofa",
+    },
+    {
+        "room_type": "EXE",
+        "room_type_name": "Executive Suite",
+        "max_occupancy": 4,
+        "bed_type": "King + Twin",
+    },
 ]
 
 
@@ -87,7 +107,7 @@ class SynXisCRSClient:
         self._client: httpx.AsyncClient | None = None
         self._access_token: str | None = None
 
-    async def __aenter__(self) -> "SynXisCRSClient":
+    async def __aenter__(self) -> SynXisCRSClient:
         """Async context manager entry."""
         if not self.settings.mock_mode:
             await self._ensure_client()
@@ -205,7 +225,9 @@ class SynXisCRSClient:
                     self._access_token = None
                     token = await self._get_access_token()
                     headers["Authorization"] = f"Bearer {token}"
-                    response = await client.request(method, url, headers=headers, **kwargs)
+                    response = await client.request(
+                        method, url, headers=headers, **kwargs
+                    )
 
                 if response.status_code == 404:
                     return {"data": None, "status": "not_found"}
@@ -227,7 +249,9 @@ class SynXisCRSClient:
                     error_body = {"message": e.response.text}
 
                 raise SynXisError(
-                    message=error_body.get("message", f"API error: {e.response.status_code}"),
+                    message=error_body.get(
+                        "message", f"API error: {e.response.status_code}"
+                    ),
                     status=e.response.status_code,
                     details=error_body,
                 ) from e
@@ -354,7 +378,9 @@ class SynXisCRSClient:
         Returns:
             List of matching properties
         """
-        logger.info("Searching properties", location=location, mock_mode=self.settings.mock_mode)
+        logger.info(
+            "Searching properties", location=location, mock_mode=self.settings.mock_mode
+        )
 
         if self.settings.mock_mode:
             return self._mock_search_properties(location)
@@ -409,29 +435,33 @@ class SynXisCRSClient:
         # Parse response into Availability model
         rooms = []
         for room_data in data.get("rooms", []):
-            rooms.append(Room(
-                room_type=room_data.get("roomType"),
-                room_type_name=room_data.get("roomTypeName"),
-                max_occupancy=room_data.get("maxOccupancy", 2),
-                bed_type=room_data.get("bedType"),
-                available=room_data.get("available", False),
-                available_count=room_data.get("availableCount", 0),
-            ))
+            rooms.append(
+                Room(
+                    room_type=room_data.get("roomType"),
+                    room_type_name=room_data.get("roomTypeName"),
+                    max_occupancy=room_data.get("maxOccupancy", 2),
+                    bed_type=room_data.get("bedType"),
+                    available=room_data.get("available", False),
+                    available_count=room_data.get("availableCount", 0),
+                )
+            )
 
         rates = []
         for rate_data in data.get("rates", []):
-            rates.append(Rate(
-                rate_plan_id=rate_data.get("ratePlanId"),
-                rate_plan_name=rate_data.get("ratePlanName"),
-                rate_plan_type=rate_data.get("ratePlanType"),
-                room_type=rate_data.get("roomType"),
-                base_rate=rate_data.get("baseRate"),
-                currency=rate_data.get("currency", "USD"),
-                taxes=rate_data.get("taxes"),
-                total_rate=rate_data.get("totalRate"),
-                cancellation_policy=rate_data.get("cancellationPolicy"),
-                deposit_required=rate_data.get("depositRequired", False),
-            ))
+            rates.append(
+                Rate(
+                    rate_plan_id=rate_data.get("ratePlanId"),
+                    rate_plan_name=rate_data.get("ratePlanName"),
+                    rate_plan_type=rate_data.get("ratePlanType"),
+                    room_type=rate_data.get("roomType"),
+                    base_rate=rate_data.get("baseRate"),
+                    currency=rate_data.get("currency", "USD"),
+                    taxes=rate_data.get("taxes"),
+                    total_rate=rate_data.get("totalRate"),
+                    cancellation_policy=rate_data.get("cancellationPolicy"),
+                    deposit_required=rate_data.get("depositRequired", False),
+                )
+            )
 
         return Availability(
             property_id=property_id,
@@ -458,7 +488,9 @@ class SynXisCRSClient:
         Returns:
             List of available rates
         """
-        logger.info("Getting rates", property_id=property_id, mock_mode=self.settings.mock_mode)
+        logger.info(
+            "Getting rates", property_id=property_id, mock_mode=self.settings.mock_mode
+        )
 
         if self.settings.mock_mode:
             availability = self._mock_get_availability(property_id, date_range)
@@ -485,18 +517,20 @@ class SynXisCRSClient:
         rates_data = result.get("data", {}).get("rates", [])
         rates = []
         for rate_data in rates_data:
-            rates.append(Rate(
-                rate_plan_id=rate_data.get("ratePlanId"),
-                rate_plan_name=rate_data.get("ratePlanName"),
-                rate_plan_type=rate_data.get("ratePlanType"),
-                room_type=rate_data.get("roomType"),
-                base_rate=rate_data.get("baseRate"),
-                currency=rate_data.get("currency", "USD"),
-                taxes=rate_data.get("taxes"),
-                total_rate=rate_data.get("totalRate"),
-                cancellation_policy=rate_data.get("cancellationPolicy"),
-                deposit_required=rate_data.get("depositRequired", False),
-            ))
+            rates.append(
+                Rate(
+                    rate_plan_id=rate_data.get("ratePlanId"),
+                    rate_plan_name=rate_data.get("ratePlanName"),
+                    rate_plan_type=rate_data.get("ratePlanType"),
+                    room_type=rate_data.get("roomType"),
+                    base_rate=rate_data.get("baseRate"),
+                    currency=rate_data.get("currency", "USD"),
+                    taxes=rate_data.get("taxes"),
+                    total_rate=rate_data.get("totalRate"),
+                    cancellation_policy=rate_data.get("cancellationPolicy"),
+                    deposit_required=rate_data.get("depositRequired", False),
+                )
+            )
 
         return rates
 

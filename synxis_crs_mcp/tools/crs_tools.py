@@ -22,7 +22,6 @@ from synxis_crs_mcp.models import (
     DateRange,
     GuestInfo,
     Property,
-    Rate,
     Reservation,
 )
 
@@ -127,11 +126,13 @@ def _reservation_to_dict(res: Reservation) -> dict[str, Any]:
         "nightly_rate": res.nightly_rate,
         "total_amount": res.total_amount,
         "currency": res.currency,
-        "cancellation_deadline": str(res.cancellation_deadline) if res.cancellation_deadline else None,
+        "cancellation_deadline": str(res.cancellation_deadline)
+        if res.cancellation_deadline
+        else None,
     }
 
 
-def register_crs_tools(app: "FastMCP", client: SynXisCRSClient) -> None:
+def register_crs_tools(app: FastMCP, client: SynXisCRSClient) -> None:
     """Register CRS management tools with the FastMCP app."""
 
     @app.tool()
@@ -218,7 +219,9 @@ def register_crs_tools(app: "FastMCP", client: SynXisCRSClient) -> None:
             )
 
         except Exception as e:
-            logger.error("Failed to get availability", property_id=property_id, error=str(e))
+            logger.error(
+                "Failed to get availability", property_id=property_id, error=str(e)
+            )
             return ToolResponse(
                 success=False,
                 message=f"Failed to check availability for {property_id}",
@@ -331,7 +334,9 @@ def register_crs_tools(app: "FastMCP", client: SynXisCRSClient) -> None:
         Returns:
             ToolResponse with reservation confirmation
         """
-        logger.info("Creating reservation", property_id=property_id, guest=guest_first_name)
+        logger.info(
+            "Creating reservation", property_id=property_id, guest=guest_first_name
+        )
 
         try:
             booking = BookingRequest(
@@ -368,7 +373,9 @@ def register_crs_tools(app: "FastMCP", client: SynXisCRSClient) -> None:
             )
 
         except Exception as e:
-            logger.error("Failed to create reservation", property_id=property_id, error=str(e))
+            logger.error(
+                "Failed to create reservation", property_id=property_id, error=str(e)
+            )
             return ToolResponse(
                 success=False,
                 message="Failed to create reservation",

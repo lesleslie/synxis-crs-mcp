@@ -3,16 +3,16 @@
 ## General Principles
 
 1. **Type Hints**: Use type hints for all function signatures and complex variables
-2. **Docstrings**: Google-style docstrings for all modules, classes, and public functions
-3. **Error Handling**: Never suppress exceptions - handle them appropriately or let them propagate
-4. **Code Style**: Follow PEP 8 with Ruff formatter (line length 88)
+1. **Docstrings**: Google-style docstrings for all modules, classes, and public functions
+1. **Error Handling**: Never suppress exceptions - handle them appropriately or let them propagate
+1. **Code Style**: Follow PEP 8 with Ruff formatter (line length 88)
 
 ## Import Order
 
 1. Standard library imports
-2. Third-party imports
-3. Local application imports
-4. Separate each group with blank line
+1. Third-party imports
+1. Local application imports
+1. Separate each group with blank line
 
 ## Naming Conventions
 
