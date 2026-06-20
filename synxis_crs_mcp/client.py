@@ -20,8 +20,10 @@ from .models import (
     Availability,
     BookingRequest,
     DateRange,
+    GuestInfo,
     Property,
     Rate,
+    RatePlanType,
     Reservation,
     ReservationStatus,
     Room,
@@ -117,6 +119,17 @@ class SynXisCRSClient:
         """Async context manager exit."""
         await self.close()
 
+    def _build_token_url(self) -> str:
+        return f"{self.settings.base_url.rsplit('/crs', 1)[0]}/oauth/token"
+
+    def _build_token_data(self) -> dict[str, str]:
+        return {
+            "grant_type": "client_credentials",
+            "client_id": self.settings.client_id,
+            "client_secret": self.settings.client_secret,
+            "scope": "crs:read crs:write",
+        }
+
     async def _ensure_client(self) -> httpx.AsyncClient:
         """Ensure HTTP client is initialized."""
         if self._client is None:
@@ -145,7 +158,6 @@ class SynXisCRSClient:
             self._access_token = "mock_access_token_12345"
             return self._access_token
 
-        # Check credentials
         if not self.settings.has_credentials():
             raise SynXisError(
                 message="OAuth2 credentials not configured. Set SYNXIS_CRS_CLIENT_ID and SYNXIS_CRS_CLIENT_SECRET.",
@@ -153,41 +165,8 @@ class SynXisCRSClient:
             )
 
         client = await self._ensure_client()
-
-        # OAuth2 token endpoint
-        token_url = f"{self.settings.base_url.rsplit('/crs', 1)[0]}/oauth/token"
-
         try:
-            response = await client.post(
-                token_url,
-                data={
-                    "grant_type": "client_credentials",
-                    "client_id": self.settings.client_id,
-                    "client_secret": self.settings.client_secret,
-                    "scope": "crs:read crs:write",
-                },
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-            )
-
-            if response.status_code == 401:
-                raise SynXisError(
-                    message="Invalid OAuth2 credentials",
-                    status=401,
-                )
-
-            response.raise_for_status()
-            token_data = response.json()
-            self._access_token = token_data.get("access_token")
-
-            if not self._access_token:
-                raise SynXisError(
-                    message="No access token in OAuth2 response",
-                    status=500,
-                )
-
-            logger.info("OAuth2 token obtained successfully")
-            return self._access_token
-
+            return await self._request_access_token(client)
         except httpx.HTTPStatusError as e:
             logger.error("OAuth2 token request failed", status=e.response.status_code)
             raise SynXisError(
@@ -200,6 +179,52 @@ class SynXisCRSClient:
                 message=f"OAuth2 request failed: {e}",
                 status=503,
             ) from e
+
+    async def _request_access_token(self, client: httpx.AsyncClient) -> str:
+        """Request and cache an OAuth2 token."""
+        response = await client.post(
+            self._build_token_url(),
+            data=self._build_token_data(),
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+        if response.status_code == 401:
+            raise SynXisError(
+                message="Invalid OAuth2 credentials",
+                status=401,
+            )
+
+        response.raise_for_status()
+        token_data = response.json()
+        self._access_token = token_data.get("access_token")
+
+        if not self._access_token:
+            raise SynXisError(
+                message="No access token in OAuth2 response",
+                status=500,
+            )
+
+        logger.info("OAuth2 token obtained successfully")
+        return self._access_token
+
+    def _build_rate_plan_type(self, value: Any) -> RatePlanType:
+        """Convert API rate plan values into the enum used by the model."""
+        if isinstance(value, RatePlanType):
+            return value
+        if value is None:
+            return RatePlanType.BAR
+        return RatePlanType(str(value))
+
+    def _build_guest_info(self, value: Any) -> GuestInfo:
+        """Normalize guest payloads into GuestInfo models."""
+        if isinstance(value, GuestInfo):
+            return value
+        if isinstance(value, dict):
+            return GuestInfo(**value)
+        raise SynXisError(
+            message="Invalid guest payload returned by SynXis API",
+            status=500,
+        )
 
     async def _make_authenticated_request(
         self,
@@ -274,10 +299,11 @@ class SynXisCRSClient:
 
     def _mock_search_properties(self, location: str) -> list[Property]:
         """Generate mock property search results."""
-        results = []
-        for prop_data in MOCK_PROPERTIES:
-            if location.lower() in prop_data["location"].lower():
-                results.append(Property(**prop_data))
+        results = [
+            Property(**prop_data)
+            for prop_data in MOCK_PROPERTIES
+            if location.lower() in prop_data["location"].lower()
+        ]
         return results or [Property(**MOCK_PROPERTIES[0])]
 
     def _mock_get_availability(
@@ -287,9 +313,9 @@ class SynXisCRSClient:
     ) -> Availability:
         """Generate mock availability data."""
         # Generate random available rooms and rates
-        rooms = []
-        rates = []
-        min_rate = float("inf")
+        rooms: list[Room] = []
+        rates: list[Rate] = []
+        min_rate = "inf"
         max_rate = 0.0
 
         for room_data in MOCK_ROOM_TYPES:
@@ -310,7 +336,7 @@ class SynXisCRSClient:
                 rate = Rate(
                     rate_plan_id=f"RATE_{room_data['room_type']}_BAR",
                     rate_plan_name="Best Available Rate",
-                    rate_plan_type="BAR",
+                    rate_plan_type=RatePlanType.BAR,
                     room_type=room_data["room_type"],
                     base_rate=round(base_rate, 2),
                     currency="USD",
@@ -320,7 +346,7 @@ class SynXisCRSClient:
                     deposit_required=False,
                 )
                 rates.append(rate)
-                min_rate = min(min_rate, rate.total_rate or base_rate)
+                min_rate = min(min_rate, rate.total_rate or base_rate)  # type: ignore
                 max_rate = max(max_rate, rate.total_rate or base_rate)
 
         return Availability(
@@ -328,7 +354,7 @@ class SynXisCRSClient:
             date_range=date_range,
             rooms=rooms,
             rates=rates,
-            min_rate=round(min_rate, 2) if min_rate != float("inf") else None,
+            min_rate=round(min_rate, 2) if min_rate != "inf" else None,  # type: ignore
             max_rate=round(max_rate, 2) if max_rate > 0 else None,
         )
 
@@ -433,35 +459,33 @@ class SynXisCRSClient:
         data = result.get("data", {})
 
         # Parse response into Availability model
-        rooms = []
-        for room_data in data.get("rooms", []):
-            rooms.append(
-                Room(
-                    room_type=room_data.get("roomType"),
-                    room_type_name=room_data.get("roomTypeName"),
-                    max_occupancy=room_data.get("maxOccupancy", 2),
-                    bed_type=room_data.get("bedType"),
-                    available=room_data.get("available", False),
-                    available_count=room_data.get("availableCount", 0),
-                )
+        rooms = [
+            Room(
+                room_type=room_data.get("roomType"),
+                room_type_name=room_data.get("roomTypeName"),
+                max_occupancy=room_data.get("maxOccupancy", 2),
+                bed_type=room_data.get("bedType"),
+                available=room_data.get("available", False),
+                available_count=room_data.get("availableCount", 0),
             )
+            for room_data in data.get("rooms", [])
+        ]
 
-        rates = []
-        for rate_data in data.get("rates", []):
-            rates.append(
-                Rate(
-                    rate_plan_id=rate_data.get("ratePlanId"),
-                    rate_plan_name=rate_data.get("ratePlanName"),
-                    rate_plan_type=rate_data.get("ratePlanType"),
-                    room_type=rate_data.get("roomType"),
-                    base_rate=rate_data.get("baseRate"),
-                    currency=rate_data.get("currency", "USD"),
-                    taxes=rate_data.get("taxes"),
-                    total_rate=rate_data.get("totalRate"),
-                    cancellation_policy=rate_data.get("cancellationPolicy"),
-                    deposit_required=rate_data.get("depositRequired", False),
-                )
+        rates = [
+            Rate(
+                rate_plan_id=rate_data.get("ratePlanId"),
+                rate_plan_name=rate_data.get("ratePlanName"),
+                rate_plan_type=rate_data.get("ratePlanType"),
+                room_type=rate_data.get("roomType"),
+                base_rate=rate_data.get("baseRate"),
+                currency=rate_data.get("currency", "USD"),
+                taxes=rate_data.get("taxes"),
+                total_rate=rate_data.get("totalRate"),
+                cancellation_policy=rate_data.get("cancellationPolicy"),
+                deposit_required=rate_data.get("depositRequired", False),
             )
+            for rate_data in data.get("rates", [])
+        ]
 
         return Availability(
             property_id=property_id,
@@ -515,22 +539,21 @@ class SynXisCRSClient:
         )
 
         rates_data = result.get("data", {}).get("rates", [])
-        rates = []
-        for rate_data in rates_data:
-            rates.append(
-                Rate(
-                    rate_plan_id=rate_data.get("ratePlanId"),
-                    rate_plan_name=rate_data.get("ratePlanName"),
-                    rate_plan_type=rate_data.get("ratePlanType"),
-                    room_type=rate_data.get("roomType"),
-                    base_rate=rate_data.get("baseRate"),
-                    currency=rate_data.get("currency", "USD"),
-                    taxes=rate_data.get("taxes"),
-                    total_rate=rate_data.get("totalRate"),
-                    cancellation_policy=rate_data.get("cancellationPolicy"),
-                    deposit_required=rate_data.get("depositRequired", False),
-                )
+        rates = [
+            Rate(
+                rate_plan_id=rate_data.get("ratePlanId"),
+                rate_plan_name=rate_data.get("ratePlanName"),
+                rate_plan_type=rate_data.get("ratePlanType"),
+                room_type=rate_data.get("roomType"),
+                base_rate=rate_data.get("baseRate"),
+                currency=rate_data.get("currency", "USD"),
+                taxes=rate_data.get("taxes"),
+                total_rate=rate_data.get("totalRate"),
+                cancellation_policy=rate_data.get("cancellationPolicy"),
+                deposit_required=rate_data.get("depositRequired", False),
             )
+            for rate_data in rates_data
+        ]
 
         return rates
 
@@ -628,11 +651,11 @@ class SynXisCRSClient:
                     start_date=date.today() + timedelta(days=7),
                     end_date=date.today() + timedelta(days=10),
                 ),
-                guest={
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "email": "john.doe@example.com",
-                },
+                guest=GuestInfo(
+                    first_name="John",
+                    last_name="Doe",
+                    email="john.doe@example.com",
+                ),
                 adults=2,
                 children=0,
                 nightly_rate=199.99,
