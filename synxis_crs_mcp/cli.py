@@ -7,25 +7,68 @@ from __future__ import annotations
 
 import os
 import warnings
+from pathlib import Path
 
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 warnings.filterwarnings("ignore", message=".*PyTorch.*TensorFlow.*Flax.*")
 
 import uvicorn
-from mcp_common import MCPServerCLIFactory, MCPServerSettings
+from mcp_common import MCPServerCLIFactory
 from mcp_common.cli.health import RuntimeHealthSnapshot
+from oneiric.core.config import OneiricMCPConfig, load_settings
 
 from synxis_crs_mcp import __version__
 
 
-class SynXisCRSSettings(MCPServerSettings):
-    """SynXis CRS MCP server settings extending MCPServerSettings."""
+class SynXisCRSSettings(OneiricMCPConfig):
+    """SynXis CRS MCP server settings extending OneiricMCPConfig.
+
+    The legacy ``MCPServerSettings`` exposed a flat YAML schema with keys
+    like ``server_name``, ``cache_root``, ``health_ttl_seconds`` and
+    ``log_level``. We keep the same surface (tests, factory code, and
+    operator-facing YAML all reference these names) but back it with
+    :class:`oneiric.core.config.OneiricMCPConfig` so the ecosystem
+    deprecation of ``MCPBaseSettings`` / ``MCPServerSettings`` does not
+    leak into SynXis CRS MCP.
+    """
 
     server_name: str = "synxis-crs-mcp"
     http_port: int = 3046
+    http_host: str = "127.0.0.1"
+    enable_http_transport: bool = False
+    cache_root: Path = Path(".oneiric_cache")
+    health_ttl_seconds: float = 60.0
+    log_level: str = "INFO"
     startup_timeout: int = 10
     shutdown_timeout: int = 10
     force_kill_timeout: int = 5
+
+    def pid_path(self) -> Path:
+        """Get PID file path."""
+        return self.cache_root / "mcp_server.pid"
+
+    def health_snapshot_path(self) -> Path:
+        """Get runtime health snapshot path."""
+        return self.cache_root / "runtime_health.json"
+
+    def telemetry_snapshot_path(self) -> Path:
+        """Get runtime telemetry snapshot path."""
+        return self.cache_root / "runtime_telemetry.json"
+
+    @classmethod
+    def load(
+        cls,
+        server_name: str = "synxis-crs-mcp",
+        config_path: str | os.PathLike[str] | None = None,
+    ) -> SynXisCRSSettings:
+        """Backwards-compatible loader preserving the ``MCPServerSettings.load`` API."""
+        loaded = load_settings(
+            path=str(config_path) if config_path else None,
+            project_name=server_name,
+        )
+        data: dict[str, object] = {"server_name": server_name}
+        data.setdefault("server_name", getattr(loaded.app, "name", server_name))
+        return cls(**data)
 
 
 def start_server_handler() -> None:
