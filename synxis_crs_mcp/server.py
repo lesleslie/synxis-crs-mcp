@@ -5,7 +5,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
 
-from fastmcp import FastMCP
+from mcp_common.fastmcp import FastMCP
 
 from synxis_crs_mcp import __version__
 from synxis_crs_mcp.client import SynXisCRSClient
