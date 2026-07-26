@@ -346,7 +346,7 @@ class SynXisCRSClient:
                     deposit_required=False,
                 )
                 rates.append(rate)
-                min_rate = min(min_rate, rate.total_rate or base_rate)  # type: ignore
+                min_rate = min(min_rate, rate.total_rate or base_rate)
                 max_rate = max(max_rate, rate.total_rate or base_rate)
 
         return Availability(
@@ -354,7 +354,7 @@ class SynXisCRSClient:
             date_range=date_range,
             rooms=rooms,
             rates=rates,
-            min_rate=round(min_rate, 2) if min_rate != "inf" else None,  # type: ignore
+            min_rate=round(min_rate, 2) if min_rate != "inf" else None,
             max_rate=round(max_rate, 2) if max_rate > 0 else None,
         )
 

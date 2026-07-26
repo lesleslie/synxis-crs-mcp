@@ -74,7 +74,7 @@ def create_app() -> FastMCP:
                 logger.info("SynXis CRS client closed")
 
     app._mcp_server.lifespan = lifespan
-    app._synxis_client = client  # type: ignore[attr-defined]
+    app._synxis_client = client  # ty: ignore[unresolved-attribute]
 
     logger.info("SynXis CRS MCP server initialized")
     return app
