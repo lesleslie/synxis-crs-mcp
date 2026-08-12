@@ -66,9 +66,8 @@ class SynXisCRSSettings(OneiricMCPConfig):
             path=str(config_path) if config_path else None,
             project_name=server_name,
         )
-        data: dict[str, object] = {"server_name": server_name}
-        data.setdefault("server_name", getattr(loaded.app, "name", server_name))
-        return cls(**data)
+        name = getattr(loaded.app, "name", server_name) or server_name
+        return cls(server_name=name)
 
 
 def start_server_handler() -> None:
@@ -106,7 +105,7 @@ def health_probe_handler() -> RuntimeHealthSnapshot:
 
 factory = MCPServerCLIFactory(
     server_name="synxis-crs-mcp",
-    settings=SynXisCRSSettings(),
+    settings=None,
     start_handler=start_server_handler,
     health_probe_handler=health_probe_handler,
 )

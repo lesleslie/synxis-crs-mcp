@@ -229,16 +229,16 @@ class SynXisError(Exception):
 
 
 __all__ = [
-    "RoomType",
-    "RatePlanType",
-    "ReservationStatus",
-    "DateRange",
-    "Property",
-    "Room",
-    "Rate",
     "Availability",
-    "GuestInfo",
     "BookingRequest",
+    "DateRange",
+    "GuestInfo",
+    "Property",
+    "Rate",
+    "RatePlanType",
     "Reservation",
+    "ReservationStatus",
+    "Room",
+    "RoomType",
     "SynXisError",
 ]

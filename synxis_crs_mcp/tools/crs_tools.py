@@ -167,7 +167,7 @@ def register_crs_tools(app: FastMCP, client: SynXisCRSClient) -> None:
                 ],
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             logger.error("Failed to search properties", location=location, error=str(e))
             return ToolResponse(
                 success=False,
@@ -218,7 +218,7 @@ def register_crs_tools(app: FastMCP, client: SynXisCRSClient) -> None:
                 ],
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             logger.error(
                 "Failed to get availability", property_id=property_id, error=str(e)
             )
@@ -290,7 +290,7 @@ def register_crs_tools(app: FastMCP, client: SynXisCRSClient) -> None:
                 ],
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             logger.error("Failed to get rates", property_id=property_id, error=str(e))
             return ToolResponse(
                 success=False,
@@ -372,7 +372,7 @@ def register_crs_tools(app: FastMCP, client: SynXisCRSClient) -> None:
                 ],
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             logger.error(
                 "Failed to create reservation", property_id=property_id, error=str(e)
             )

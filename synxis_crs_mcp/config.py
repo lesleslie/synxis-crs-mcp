@@ -185,9 +185,9 @@ def get_logger_instance(name: str = "synxis-crs-mcp") -> Any:
 
 
 __all__ = [
+    "ONEIRIC_LOGGING_AVAILABLE",
     "SynXisCRSSettings",
+    "get_logger_instance",
     "get_settings",
     "setup_logging",
-    "get_logger_instance",
-    "ONEIRIC_LOGGING_AVAILABLE",
 ]

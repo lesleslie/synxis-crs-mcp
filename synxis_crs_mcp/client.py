@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import asyncio
 import random
-from datetime import date, timedelta
-from typing import Any
+from datetime import UTC, date, datetime, timedelta
+from typing import Any, Self
 
 import httpx
 
@@ -109,13 +109,13 @@ class SynXisCRSClient:
         self._client: httpx.AsyncClient | None = None
         self._access_token: str | None = None
 
-    async def __aenter__(self) -> SynXisCRSClient:
+    async def __aenter__(self) -> Self:
         """Async context manager entry."""
         if not self.settings.mock_mode:
             await self._ensure_client()
         return self
 
-    async def __aexit__(self, *args: Any) -> None:
+    async def __aexit__(self, *args: object) -> None:
         """Async context manager exit."""
         await self.close()
 
@@ -270,7 +270,7 @@ class SynXisCRSClient:
                 error_body = {}
                 try:
                     error_body = e.response.json()
-                except Exception:
+                except (ValueError, TypeError):
                     error_body = {"message": e.response.text}
 
                 raise SynXisError(
@@ -388,7 +388,7 @@ class SynXisCRSClient:
             currency="USD",
             special_requests=booking.special_requests,
             cancellation_deadline=booking.date_range.start_date - timedelta(days=1),
-            created_at=date.today().isoformat(),
+            created_at=datetime.now(tz=UTC).date().isoformat(),
         )
 
     # =========================================================================
@@ -648,8 +648,8 @@ class SynXisCRSClient:
                 rate_plan_name="Best Available Rate",
                 status=ReservationStatus.CONFIRMED,
                 date_range=DateRange(
-                    start_date=date.today() + timedelta(days=7),
-                    end_date=date.today() + timedelta(days=10),
+                    start_date=datetime.now(tz=UTC).date() + timedelta(days=7),
+                    end_date=datetime.now(tz=UTC).date() + timedelta(days=10),
                 ),
                 guest=GuestInfo(
                     first_name="John",
