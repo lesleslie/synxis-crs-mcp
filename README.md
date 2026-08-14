@@ -8,7 +8,7 @@
 
 MCP server for SynXis CRS (Central Reservation System) integration.
 
-**Version:** 0.1.4
+**Version:** 0.2.0
 **Status:** Internal Bodai integration component
 
 ## Quick Links
@@ -35,12 +35,15 @@ The server is intentionally separate from `synxis-pms-mcp`. CRS owns shopping an
 
 ## Capabilities
 
-Implemented tool surface:
+Tools (4 MCP tools):
 
-- **Property search**: find hotels by city, state, region, or other location text
-- **Availability lookup**: check available room types for a property and date range
-- **Rate lookup**: retrieve rate plans, totals, currency, and cancellation policy details
-- **Reservation creation**: create a booking from property, room type, rate plan, dates, and guest details
+- **Property search** (`search_properties`): find hotels by city, state, region, or other location text
+- **Availability lookup** (`get_availability`): check available room types for a property and date range
+- **Rate lookup** (`get_rates`): retrieve rate plans, totals, currency, and cancellation policy details
+- **Reservation creation** (`create_reservation`): create a booking from property, room type, rate plan, dates, and guest details
+
+Plus runtime features:
+
 - **Mock mode**: exercise the MCP tool surface without live SynXis credentials
 - **HTTP health routes**: `/health` and `/healthz` for MCP client and process supervision checks
 
@@ -129,7 +132,7 @@ curl http://127.0.0.1:3046/healthz
 |------|---------|-----------------|
 | `search_properties` | Search hotels by location | `location` |
 | `get_availability` | Check room availability for a property | `property_id`, `start_date`, `end_date` |
-| `get_rates` | Retrieve rates for a property and date range | `property_id`, `start_date`, `end_date` |
+| `get_rates` | Retrieve rates for a property and date range | `property_id`, `start_date`, `end_date` (optional: `room_type`) |
 | `create_reservation` | Create a hotel reservation | `property_id`, `room_type`, `rate_plan_id`, `start_date`, `end_date`, guest fields |
 
 Dates use `YYYY-MM-DD`. Tool responses follow a consistent `ToolResponse` shape:

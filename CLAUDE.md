@@ -29,7 +29,7 @@ uv run pytest
 uv run pytest -v
 
 # Run specific test file
-uv run pytest tests/test_specific.py
+uv run pytest tests/test_schema_validation.py
 
 # Run with pytest-xdist (parallel)
 uv run pytest -n auto
