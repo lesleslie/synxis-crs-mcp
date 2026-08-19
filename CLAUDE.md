@@ -89,3 +89,22 @@ Crackerjack provides AI agent skills via MCP:
 Access these skills through the crackerjack MCP server (port 8676).
 
 <!-- CRACKERJACK_END -->
+
+## Tool Profile System
+
+synxis-crs-mcp follows the Bodai ecosystem-wide convention of gating tool
+registration via a `*_TOOL_PROFILE` environment variable (mcp-common
+0.18.0+). The dispatch surface is in `synxis_crs_mcp/tools/profiles.py`;
+the server wires it from `synxis_crs_mcp/server.py::create_app` via
+`await apply_synxis_crs_tool_profile(app)`.
+
+| Profile | Env var | Registered groups | Tool count |
+|---------|-----------------------------------------|-------------------|------------|
+| FULL | `SYNXIS_CRS_TOOL_PROFILE=full` (default) | `crs_tools` | 4 + `discover_tools` = 5 |
+| MINIMAL | `SYNXIS_CRS_TOOL_PROFILE=minimal` | (none) | 0 + `discover_tools` = 1 |
+
+`STANDARD` is intentionally omitted (Tier-B 2-tier mapping per the W3
+brief). Unset / empty / unknown env var → FULL.
+
+The rationale and design decisions live at
+[`docs/architecture/tool-profile-rationale.md`](./docs/architecture/tool-profile-rationale.md).
