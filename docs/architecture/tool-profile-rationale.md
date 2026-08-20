@@ -28,8 +28,8 @@ the W3 brief). The mapping lives in `synxis_crs_mcp/tools/profiles.py`:
 
 | Profile | Registered groups | Total tools |
 |---------|-------------------|-------------|
-| MINIMAL | (none)            | 0 + `discover_tools` = 1 |
-| FULL    | `crs_tools`       | 4 + `discover_tools` = 5 |
+| MINIMAL | (none) | 0 + `discover_tools` = 1 |
+| FULL | `crs_tools` | 4 + `discover_tools` = 5 |
 
 `STANDARD` is intentionally **omitted** — synxis-crs-mcp has only 1
 register group and 4 tools; a 3-tier split adds no operational value.
@@ -89,16 +89,17 @@ silently.
 
 | Profile | Pre-refactor (inline) | Post-refactor (W0 helper) | Match? |
 |---------|----------------------|---------------------------|--------|
-| (unset) | 4 tools at startup   | 4 + `discover_tools` = 5 | YES (extra discover_tools is by design) |
-| MINIMAL | (not supported)      | 0 + `discover_tools` = 1 | NEW behavior |
-| FULL    | (always-on)          | 4 + `discover_tools` = 5 | YES |
+| (unset) | 4 tools at startup | 4 + `discover_tools` = 5 | YES (extra discover_tools is by design) |
+| MINIMAL | (not supported) | 0 + `discover_tools` = 1 | NEW behavior |
+| FULL | (always-on) | 4 + `discover_tools` = 5 | YES |
 
 The 4 CRS tool names are identical at FULL profile to the pre-refactor
 inline mode (verified by
 `tests/unit/test_tool_profile.py::test_full_registers_all_4_crs_tools`).
 The W0 helper additionally registers the `discover_tools` meta-tool,
 which is the ecosystem-wide convention (matches W1.1-W1.4 + W2a + W2b.1
-+ W2b.2 + W2b.3 + W3.1 + W3.2 behavior).
+
+- W2b.2 + W2b.3 + W3.1 + W3.2 behavior).
 
 The `/healthz` custom HTTP route is unchanged (registered via
 `register_http_health_route(app, ...)`) — it does NOT register an MCP
