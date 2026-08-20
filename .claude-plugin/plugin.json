@@ -1,0 +1,18 @@
+{
+  "author": {
+    "name": "Bodai"
+  },
+  "description": "Bodai plugin for the synxis-crs-mcp central reservation system server.",
+  "keywords": [
+    "bodai",
+    "mcp",
+    "synxis",
+    "crs",
+    "hotel",
+    "reservation"
+  ],
+  "mcpServers": "./.mcp.json",
+  "name": "synxis-crs",
+  "schema_version": "1.0.0",
+  "version": "0.1.0"
+}

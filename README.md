@@ -20,6 +20,11 @@ MCP server for SynXis CRS (Central Reservation System) integration.
 - [Tool Reference](#tool-reference)
 - [Configuration](#configuration)
 - [Development](#development)
+- [Installation via Bodai Marketplace](#installation-via-bodai-marketplace)
+
+## Installation via Bodai Marketplace
+
+This repo is packaged as a Bodai Claude Code plugin. Add the `bodai-plugins` marketplace, then install the `synxis-crs` plugin to expose the slash commands (`/synxis-crs-lookup`, `/synxis-crs-availability`, `/synxis-crs-reservation`) and connect to the running MCP server at `http://localhost:3046/mcp`. The plugin self-references its colocated `.mcp.json`, so no additional client configuration is required. Use the marketplace to keep the plugin versioned alongside the underlying server and to receive the same update flow as the rest of the Bodai fleet.
 
 ## Quality & CI
 

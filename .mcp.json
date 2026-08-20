@@ -1,0 +1,6 @@
+{
+  "synxis-crs": {
+    "type": "http",
+    "url": "http://localhost:3046/mcp"
+  }
+}
