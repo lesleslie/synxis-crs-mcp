@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-21
+
+### Added
+
+- synxis-crs-mcp: Adopt apply_tool_profile with SYNXIS_CRS_TOOL_PROFILE (W3.3 Tier-B 2-tier)
+- synxis-crs: Bodai plugin conversion (manifest, mcp.json, slash commands)
+
+### Documentation
+
+- synxis-crs-mcp: Tool-profile rationale update before dep refresh
+
+### Internal
+
+- gitignore: Untrack .pyscn/ (bodai 2026-08-20)
+- synxis-crs-mcp: Add [tool.creosote] block for dep hygiene
+- synxis-crs-mcp: Bootstrap [tool.crackerjack] section + uv sync upgrade
+- synxis-crs-mcp: Gitignore .lycheecache (file, not just dir)
+- synxis-crs-mcp: Gitignore .lycheecache + .hypothesis
+- synxis-crs-mcp: Untrack .lycheecache (final)
+- synxis-crs-mcp: Upgrade crackerjack 0.73.5->0.74.0, oneiric 0.16.3->0.16.5
+
 ## [0.2.1] - 2026-08-16
 
 ### Documentation
