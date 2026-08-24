@@ -7,7 +7,7 @@ name = "synxis-crs-mcp"
 version = "0.3.0"
 description = "Unofficial MCP server for SynXis CRS (Central Reservation System) API"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "fastmcp>=3.4.0,<4",
     "mcp-common>=0.18.0",
