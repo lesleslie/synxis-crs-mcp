@@ -270,7 +270,7 @@ class SynXisCRSClient:
                 error_body = {}
                 try:
                     error_body = e.response.json()
-                except (ValueError, TypeError):
+                except ValueError, TypeError:
                     error_body = {"message": e.response.text}
 
                 raise SynXisError(

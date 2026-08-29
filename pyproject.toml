@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "synxis-crs-mcp"
-version = "0.4.0"
+version = "0.4.1"
 description = "Unofficial MCP server for SynXis CRS (Central Reservation System) API"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -93,9 +93,6 @@ exclude_also = [
 target = ["synxis_crs_mcp"]
 skips = ["B101", "B110", "B112", "B404", "B603", "B607"]
 exclude_dirs = ["tests/"]
-
-[tool.uv.sources]
-mcp-common = { path = "/Users/les/Projects/mcp-common", editable = true }
 
 [tool.creosote]
 paths = [
