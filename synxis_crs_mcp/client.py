@@ -13,7 +13,7 @@ import random
 from datetime import UTC, date, datetime, timedelta
 from typing import Any, Self
 
-import httpx
+import httpx2 as httpx
 
 from .config import SynXisCRSSettings, get_logger_instance, get_settings
 from .models import (

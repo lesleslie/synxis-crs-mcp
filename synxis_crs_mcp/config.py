@@ -14,7 +14,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-import httpx
+import httpx2 as httpx
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
