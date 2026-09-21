@@ -1,15 +1,12 @@
 {
   "author": {
-    "name": "Bodai"
+    "name": "Wedgwood Web Works"
   },
-  "description": "Bodai plugin for the synxis-crs-mcp central reservation system server.",
+  "description": "Plugin for the synxis-crs-mcp central reservation system server.",
   "keywords": [
-    "bodai",
     "mcp",
-    "synxis",
-    "crs",
-    "hotel",
-    "reservation"
+    "synxis-crs",
+    "reservations"
   ],
   "mcpServers": "./.mcp.json",
   "name": "synxis-crs",
