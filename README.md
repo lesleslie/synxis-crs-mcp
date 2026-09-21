@@ -28,7 +28,7 @@ This repo is packaged as a Claude Code plugin. Register the [www-mcp-servers mar
 
 ## Quality & CI
 
-Crackerjack is the standard quality-control and CI/CD gate for SynXis CRS MCP changes. Local verification should mirror the Crackerjack workflow used across the Bodai ecosystem.
+Crackerjack is the standard quality-control and CI/CD gate for SynXis CRS MCP changes. Local verification should mirror the Crackerjack workflow.
 
 ______________________________________________________________________
 
@@ -91,7 +91,7 @@ The default HTTP bind is `127.0.0.1:3046`.
 
 ## CLI Commands
 
-The CLI is built with `mcp-common` and provides the standard lifecycle command surface used by Bodai MCP servers.
+The CLI is built with `mcp-common` and provides the standard lifecycle command surface.
 
 ```bash
 uv run synxis-crs-mcp start      # Start the HTTP MCP server
@@ -207,3 +207,7 @@ uv run pytest tests/test_schema_validation.py -v
 - Keep examples and tests on mock mode or scrubbed fixtures.
 - Treat reservation payloads and guest contact fields as sensitive operational data.
 - Keep SynXis URLs, ports, and tenant settings configurable rather than hard-coded in new code.
+
+Built on [Oneiric](https://github.com/lesleslie/oneiric) for runtime configuration
+and [mcp-common](https://github.com/lesleslie/mcp-common) for the FastMCP
+baseline. [Crackerjack](https://github.com/lesleslie/crackerjack) gates every commit.
