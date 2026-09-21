@@ -92,7 +92,7 @@ Access these skills through the crackerjack MCP server (port 8676).
 
 ## Tool Profile System
 
-synxis-crs-mcp follows the Bodai ecosystem-wide convention of gating tool
+synxis-crs-mcp follows the shared cross-repo convention of gating tool
 registration via a `*_TOOL_PROFILE` environment variable (mcp-common
 0.18.0+). The dispatch surface is in `synxis_crs_mcp/tools/profiles.py`;
 the server wires it from `synxis_crs_mcp/server.py::create_app` via
@@ -108,3 +108,13 @@ brief). Unset / empty / unknown env var → FULL.
 
 The rationale and design decisions live at
 [`docs/architecture/tool-profile-rationale.md`](./docs/architecture/tool-profile-rationale.md).
+
+## Bodai integration
+
+When installed alongside the [Bodai ecosystem](https://github.com/lesleslie/bodai),
+synxis-crs-mcp follows the shared cross-repo conventions: Crackerjack for CI/CD
+quality gates, the four mcp-common baseline tools (`discover_tools`,
+`get_liveness`, `get_readiness`, `health_check_all`), and the MCP wiring
+discipline documented in `mahavishnu/.claude/decisions/mcp-backend-wiring-discipline.md`.
+No Bodai-specific code is imported at runtime — integration is purely via
+shared conventions.
